@@ -43,22 +43,33 @@ export default defineComponent({
         const kgToTon =  ["kg", "metric ton", "0.001"]
 
         const convert = (amount : number, from : string, to : string): number => {
-            if(from == "lb" && to=="g"){
-                return Number((amount * Number(lbToG[2])).toFixed(2))
-            }
+            
+            switch (from) {
+                case "g":
+                    if (to === "lb") return Number(((amount ** 2) / (amount * Number(lbToG[2]))).toFixed(2)) // Using cross multiplication
+                    if (to === "kg") return Number(convert(convert(amount, from, "lb"), "lb", to).toFixed(2)) // Using lb as a catalyst for conversion
+                    if (to === "metric_ton") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
+                    break
 
-            if(from == "lb" && to=="kg"){
-                return Number((amount * Number(lbToKg[2])).toFixed(2))
+                case "lb":
+                    if (to === "g") return Number((amount * Number(lbToG[2])).toFixed(2))
+                    if (to === "kg") return Number((amount * Number(lbToKg[2])).toFixed(2))
+                    if (to === "metric_ton") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
+                    break
+                
+                case "kg":
+                    if (to === "lb") return Number((amount * Number(kgToLb[2])).toFixed(2))
+                    if (to === "metric_ton") return Number((amount * Number(kgToTon[2])).toFixed(2))
+                    if (to === "g") return Number(convert(convert(amount, from, "lb"), "lb", to).toFixed(2))
+                    break
+                
+                    
+                case "metric_ton":
+                    if (to === "g") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
+                    if (to === "lb") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
+                    if (to === "kg") return (amount ** 2) / Number((amount * Number(kgToTon[2])).toFixed(2))
             }
-
-            if(from == "kg" && to=="lb"){
-                return Number((amount * Number(kgToLb[2])).toFixed(2))
-            }
-
-            if(from == "kg" && to=="metric_ton"){
-                return Number((amount * Number(kgToTon[2])).toFixed(2))
-            }
-
+        
             return amount
         }
 
