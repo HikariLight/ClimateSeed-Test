@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <h1>Unit Conversion</h1>
+    <h1 id="title">Unit Conversion</h1>
     <ConversionForm />
   </div>
 </template>
@@ -18,5 +18,15 @@ export default defineComponent({
 </script>
 
 <style>
+  .app{
+    background-color: var(--white);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    width: 40vh;
+  }
 
+  #title{
+    color: var(--success);
+  }
 </style>
