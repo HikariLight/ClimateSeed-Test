@@ -5,18 +5,12 @@
 
         <label>From:</label>
         <select v-model="from">
-            <option value="g">Grams</option>
-            <option value="lb">Pounds (lb)</option>
-            <option value="kg">Kilograms</option>
-            <option value="metric_ton">Metric Tons</option>
+            <UnitsOptions :units=units />
         </select>
         
         <label>To:</label>
         <select v-model="to">
-            <option value="g">Grams</option>
-            <option value="lb">Pounds (lb)</option>
-            <option value="kg">Kilograms</option>
-            <option value="metric_ton">Metric Tons</option>
+            <UnitsOptions :units=units />
         </select>
 
         <button id="convertButton" @click="handleClick">Convert</button>
@@ -27,14 +21,21 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import UnitsOptions from "./UnitOptions.vue"
 
 export default defineComponent({
     name: "ConversionForm",
+    components: {
+        UnitsOptions
+    },
     setup() {
 
         const amount = ref<number>()
         const from = ref<string>()
         const to = ref<string>()
+        const result = ref<number>()
+
+        const units = ["g", "lb", "kg", "metric_ton"]
 
         const handleClick = (e: Event) =>{
             e.preventDefault()
@@ -44,6 +45,7 @@ export default defineComponent({
             amount,
             from,
             to,
+            units,
             handleClick
         }
     },
