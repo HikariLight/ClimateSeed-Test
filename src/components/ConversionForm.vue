@@ -30,15 +30,41 @@ export default defineComponent({
     },
     setup() {
 
-        const amount = ref<number>()
-        const from = ref<string>()
-        const to = ref<string>()
-        const result = ref<number>()
+        const amount = ref<number>(0)
+        const from = ref<string>("")
+        const to = ref<string>("")
+        const result = ref<number>(0)
 
         const units = ["g", "lb", "kg", "metric_ton"]
 
+        const lbToG = ["lb", "g", "453.59237"]
+        const lbToKg = ["lb", "kg", "0.45359237"]
+        const kgToLb = ["kg", "lb", "2.20462262"]
+        const kgToTon =  ["kg", "metric ton", "0.001"]
+
+        const convert = (amount : number, from : string, to : string): number => {
+            if(from == "lb" && to=="g"){
+                return Number((amount * Number(lbToG[2])).toFixed(2))
+            }
+
+            if(from == "lb" && to=="kg"){
+                return Number((amount * Number(lbToKg[2])).toFixed(2))
+            }
+
+            if(from == "kg" && to=="lb"){
+                return Number((amount * Number(kgToLb[2])).toFixed(2))
+            }
+
+            if(from == "kg" && to=="metric_ton"){
+                return Number((amount * Number(kgToTon[2])).toFixed(2))
+            }
+
+            return amount
+        }
+
         const handleClick = (e: Event) =>{
             e.preventDefault()
+            result.value = convert(amount.value, from.value, to.value)
         }
 
         return {
@@ -46,7 +72,8 @@ export default defineComponent({
             from,
             to,
             units,
-            handleClick
+            handleClick,
+            result
         }
     },
 })
