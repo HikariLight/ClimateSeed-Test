@@ -73,9 +73,22 @@ export default defineComponent({
             return amount
         }
 
+
+        const verifyAmount = (amount: number) => {
+            return typeof amount === 'number' && amount >= 0
+        }
+
+        const verifyUnit = (unit: string) => {
+            return units.includes(unit)
+        }
+
         const handleClick = (e: Event) =>{
             e.preventDefault()
-            result.value = convert(amount.value, from.value, to.value)
+            if(verifyAmount(amount.value) && verifyUnit(from.value) && verifyUnit(to.value)){
+                result.value = convert(amount.value, from.value, to.value)
+            } else{
+                alert("Invalid input")
+            }
         }
 
         return {
