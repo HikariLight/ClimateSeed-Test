@@ -3,12 +3,12 @@
         <label>Amount</label>
         <input :class="{invalid: !amountValid}" type="text" v-model.number="amount">
 
-        <label>From:</label>
+        <label class="selectLabels">From:</label>
         <select :class="{invalid: !fromValid}" v-model="from">
             <UnitsOptions :units=units />
         </select>
 
-        <label>To:</label>
+        <label class="selectLabels">To:</label>
         <select :class="{invalid: !toValid}" v-model="to">
             <UnitsOptions :units=units />
         </select>
@@ -114,6 +114,10 @@ export default defineComponent({
         padding: 0.5rem;
         display: block;
         width: 90%;
+    }
+
+    .selectLabels{
+        margin: 0 0.5rem;
     }
 
     .conversionForm select{
