@@ -1,21 +1,21 @@
 <template>
     <form class="conversionForm">
         <label>Amount</label>
-        <input type="text" v-model.number="amount">
+        <input :class="{invalid: !amountValid}" type="text" v-model.number="amount">
 
         <label>From:</label>
-        <select v-model="from">
+        <select :class="{invalid: !fromValid}" v-model="from">
             <UnitsOptions :units=units />
         </select>
-        
+
         <label>To:</label>
-        <select v-model="to">
+        <select :class="{invalid: !toValid}" v-model="to">
             <UnitsOptions :units=units />
         </select>
 
         <button id="convertButton" @click="handleClick">Convert</button>
 
-        <h3 id="result" v-if="result">Result: {{result}} {{ to }}</h3>
+        <h3 id="result" v-if="result">Result: {{result}}</h3>
     </form>
 </template>
 
@@ -34,6 +34,10 @@ export default defineComponent({
         const from = ref<string>("")
         const to = ref<string>("")
         const result = ref<number>(0)
+
+        const amountValid = ref<boolean>(true)
+        const fromValid = ref<boolean>(true)
+        const toValid = ref<boolean>(true)
 
         const units = ["g", "lb", "kg", "metric_ton"]
 
@@ -74,27 +78,31 @@ export default defineComponent({
         }
 
 
-        const verifyAmount = (amount: number) => {
-            return typeof amount === 'number' && amount >= 0
+        const verifyAmount = (amount: number) : boolean => {
+            amountValid.value = typeof amount === 'number' && amount >= 0
+            return amountValid.value
         }
 
-        const verifyUnit = (unit: string) => {
-            return units.includes(unit)
+        const verifyUnit = (type: string, unit: string) : boolean => {
+            let valid = units.includes(unit);
+            (type == "from") ? fromValid.value = valid : toValid.value = valid
+            return valid
         }
 
         const handleClick = (e: Event) =>{
             e.preventDefault()
-            if(verifyAmount(amount.value) && verifyUnit(from.value) && verifyUnit(to.value)){
+            if(verifyAmount(amount.value) && verifyUnit("from", from.value) && verifyUnit("to", to.value)){
                 result.value = convert(amount.value, from.value, to.value)
-            } else{
-                alert("Invalid input")
             }
         }
 
         return {
             amount,
+            amountValid,
             from,
+            fromValid,
             to,
+            toValid,
             units,
             handleClick,
             result
@@ -130,6 +138,10 @@ export default defineComponent({
         border-radius: 15px;
         background-color: var(--success);
         color: white;
+    }
+
+    .invalid{
+        border: 0.5px solid var(--danger)
     }
 
     #result{
