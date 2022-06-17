@@ -39,42 +39,33 @@ export default defineComponent({
         const fromValid = ref<boolean>(true)
         const toValid = ref<boolean>(true)
 
-        const units = ["g", "lb", "kg", "metric_ton"]
+        const units = ["g", "lb", "kg", "metric ton"]
 
-        const lbToG = ["lb", "g", "453.59237"]
-        const lbToKg = ["lb", "kg", "0.45359237"]
-        const kgToLb = ["kg", "lb", "2.20462262"]
-        const kgToTon =  ["kg", "metric ton", "0.001"]
+        const unitsData = [["lb", "g", "453.59237"],
+                            ["lb", "kg", "0.45359237"],               
+                            ["kg", "lb", "2.20462262"],                       
+                            ["kg", "metric ton", "0.001"]]
 
-        const convert = (amount : number, from : string, to : string): number => {
+        const convert = (amount : number, from : string, to : string, unitsData : string[][]): number => {
             
-            switch (from) {
-                case "g":
-                    if (to === "lb") return Number(((amount ** 2) / (amount * Number(lbToG[2]))).toFixed(2)) // Using cross multiplication
-                    if (to === "kg") return Number(convert(convert(amount, from, "lb"), "lb", to).toFixed(2)) // Using lb as a catalyst for conversion
-                    if (to === "metric_ton") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
-                    break
-
-                case "lb":
-                    if (to === "g") return Number((amount * Number(lbToG[2])).toFixed(2))
-                    if (to === "kg") return Number((amount * Number(lbToKg[2])).toFixed(2))
-                    if (to === "metric_ton") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
-                    break
-                
-                case "kg":
-                    if (to === "lb") return Number((amount * Number(kgToLb[2])).toFixed(2))
-                    if (to === "metric_ton") return Number((amount * Number(kgToTon[2])).toFixed(2))
-                    if (to === "g") return Number(convert(convert(amount, from, "lb"), "lb", to).toFixed(2))
-                    break
-                
-                    
-                case "metric_ton":
-                    if (to === "g") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
-                    if (to === "lb") return Number(convert(convert(amount, from, "kg"), "kg", to).toFixed(2))
-                    if (to === "kg") return (amount ** 2) / Number((amount * Number(kgToTon[2])).toFixed(2))
+            if(from == to) return amount
+            
+            for(let dataFrame of unitsData){    
+                if(from == dataFrame[0] && to == dataFrame[1]) return (amount * Number(dataFrame[2]))
+                if(from == dataFrame[1] && to == dataFrame[0]) return (amount ** 2) / (amount * Number(dataFrame[2])) // Using cross multiplication   
             }
-        
-            return amount
+
+            // Using another unit as a catalyst
+            const findCatalyst = (unit : string, unitsData : string[][]) => {
+                for(let dataFrame of unitsData){
+                    if(dataFrame[1] == unit) return dataFrame[0]
+                }
+                return unit
+            }
+
+            let catalyst = findCatalyst(to, unitsData)
+
+            return convert(convert(amount, from, catalyst, unitsData), catalyst, to, unitsData)
         }
 
 
@@ -92,7 +83,7 @@ export default defineComponent({
         const handleClick = (e: Event) =>{
             e.preventDefault()
             if(verifyAmount(amount.value) && verifyUnit("from", from.value) && verifyUnit("to", to.value)){
-                result.value = convert(amount.value, from.value, to.value)
+                result.value = convert(amount.value, from.value, to.value, unitsData)
             }
         }
 
