@@ -46,17 +46,21 @@ export default defineComponent({
                             ["kg", "lb", "2.20462262"],                       
                             ["kg", "metric ton", "0.001"]]
 
+        const formatNumber = (num : number): number => {
+            return (num < 1) ? num : Number(num.toFixed(2))
+        }
+
         const convert = (amount : number, from : string, to : string, unitsData : string[][]): number => {
             
             if(from == to) return amount
             
             for(let dataFrame of unitsData){    
-                if(from == dataFrame[0] && to == dataFrame[1]) return (amount * Number(dataFrame[2]))
-                if(from == dataFrame[1] && to == dataFrame[0]) return (amount ** 2) / (amount * Number(dataFrame[2])) // Using cross multiplication   
+                if(from == dataFrame[0] && to == dataFrame[1]) return formatNumber((amount * Number(dataFrame[2])))
+                if(from == dataFrame[1] && to == dataFrame[0]) return formatNumber((amount ** 2) / (amount * Number(dataFrame[2]))) // Using cross multiplication   
             }
 
             // Using another unit as a catalyst
-            const findCatalyst = (unit : string, unitsData : string[][]) => {
+            const findCatalyst = (unit : string, unitsData : string[][]) : string => {
                 for(let dataFrame of unitsData){
                     if(dataFrame[1] == unit) return dataFrame[0]
                 }
